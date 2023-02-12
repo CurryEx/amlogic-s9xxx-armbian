@@ -172,7 +172,7 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         if: ${{ steps.compile.outputs.status == 'success' && !cancelled() && inputs.upload_to_artifacts }}
         with:
-          name: ${{ steps.compile.outputs.build_tag }}
+          name: ${{ steps.compile.outputs.build_tag }}-trunk
           retention-days: 14
           path: build/output/images/*.img.gz
 
