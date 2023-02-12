@@ -31,6 +31,7 @@ on:
           - 5.4.225
           - 5.10.160
           - 5.15.85
+          - 5.15.92
           - 6.1.1
       kernel_auto:
         description: "Auto use the latest kernel"
@@ -61,6 +62,11 @@ on:
         description: "Set the path of kernel .config"
         required: false
         default: ""
+      upload_to_artifacts:
+        description: "Check to upload build files to Artifacts (no token settings required), uncheck to Release"
+        required: false
+        default: false
+        type: boolean
 
 env:
   TZ: America/New_York
@@ -68,7 +74,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -85,6 +91,7 @@ jobs:
           sudo -E apt-get -qq update -y
           sudo -E apt-get -qq full-upgrade -y
           sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+          sudo -E apt-get -qq install -y tree
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "${TZ}"
@@ -92,7 +99,7 @@ jobs:
 
       - name: Compile the kernel
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
         with:
           build_target: kernel
           kernel_source: ${{ inputs.kernel_source }}
@@ -103,15 +110,24 @@ jobs:
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
 
+
+      - name: Upload Kernel to Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && inputs.upload_to_artifacts }}
+        with:
+          name: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
+          retention-days: 14
+          path: ${{ env.PACKAGED_OUTPUTPATH }}
+
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && !inputs.upload_to_artifacts }}
         with:
-          tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
-          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-          allowUpdates: true
-          token: ${{ secrets.GH_TOKEN }}
-          body: |
-            The kernel can be used to compile Armbian and OpenWrt.
-            The kernel source code comes from: ${{ inputs.kernel_source }}
-            The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
+         tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
+         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+         allowUpdates: true
+         token: ${{ secrets.GH_TOKEN }}
+         body: |
+           The kernel can be used to compile Armbian and OpenWrt.
+           The kernel source code comes from: ${{ inputs.kernel_source }}
+           The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}

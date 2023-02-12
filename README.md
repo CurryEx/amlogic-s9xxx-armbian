@@ -76,6 +76,8 @@ If there is a set of kernel files in the current directory, it will be updated w
 
 When updating the kernel, it will automatically back up the kernel used by the current system. The storage path is in the `/ddbr/backup` directory, which can be deleted if not needed.
 
+💡 It may cause problem if the version of Kernel files in current directory the same as the current kernel version. In this case, run `which armbian-update` to locate the `armbian-update` first, then, use the editor you familiar to edit the file. Find `Already the latest version` comment this line and previous line, change `elif` to `if` below and save.
+
 💡 When the system cannot be started from eMMC due to incomplete updates and other problems caused by special reasons, you can start any kernel version of the Armian system from USB, and run the `armbian-update -r` command to update the system kernel in USB to eMMC to achieve the purpose of rescue.
 
 - ### Install common software

@@ -84,7 +84,12 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 2. 设置隐私变量 GITHUB_TOKEN
 
-设置 Github 隐私变量 `GITHUB_TOKEN` 。在固件编译完成后，我们需要上传固件到 Releases ，我们根据 Github 官方的要求设置这个变量，方法如下：
+在使用GitHub Actions固件编译完成后，我们需要上传。若您想上传到Release中使其持久存在并可用于其他Workflows，请跳过本段；若只为个人编译后使用，可以无需设置token，只需要在Actions创建Workflow时勾选最后一个选项，编译完成后就可以转到[第七节](#7-下载固件)查看下载方法。
+
+![option](https://user-images.githubusercontent.com/46918772/218275632-5ab3db20-f9a9-43c7-a298-35240c5d08de.png)
+
+对于想要上传到Release的用户，我们根据 Github 官方的要求设置设置 Github 隐私变量 `GITHUB_TOKEN` 方法如下：
+
 Personal center: Settings > Developer settings > Personal access tokens > Generate new token ( Name: GITHUB_TOKEN, Select: public_repo )。其他选项根据自己需要可以多选。提交保存，复制系统生成的加密 KEY 的值，先保存到自己电脑的记事本，下一步会用到这个值。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
@@ -177,7 +182,11 @@ schedule:
 
 ## 7. 下载固件
 
-从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的固件。图示如下：
+若您勾选了上传到Workflows Artifacts，您可以在Actions > *执行的Workflow* > Summary > Artifacts中找到并下载：
+
+![image](https://user-images.githubusercontent.com/46918772/218276112-0f5587fe-4b03-4b61-aef0-2d175d90ba0d.png)
+
+若您选择上传到 Release ，请从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的固件。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />

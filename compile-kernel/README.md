@@ -68,7 +68,7 @@ This way you compile the kernel using your modified repository.
     kernel_sign: -yourname
 ```
 
-💡Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [Add TOKEN](../build-armbian/documents#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:
+💡Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [Add Token or Use Artifacts](../build-armbian/documents#2-set-the-privacy-variable-github_token) according to clause 2. 3. in the markdown. Eg:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
@@ -78,16 +78,17 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 
 The relevant parameters correspond to the `local compilation commands`, please refer to the above description.
 
-| Parameter        | Defaults         | Description                 |
-| ---------------- | ---------------- | --------------------------- |
-| build_target     | kernel           | Fixed parameter `kernel`, set the compilation target to the kernel. |
-| kernel_version   | 5.10.125_5.15.50 | Specify kernel name, such as `5.10.125`. Function reference `-k` |
-| kernel_auto      | true             | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
-| kernel_package   | all              | Set the package list for compiling the kernel. The default is `all`. Function reference `-p` |
-| kernel_toolchain | clang            | Set the compilation toolchain. The default is `clang`. Function reference `-t` |
-| kernel_sign      | -ophub           | Set the kernel custom signature. The default is `-ophub`. Function reference `-n` |
-| kernel_source    | unifreq          | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
-| kernel_config    | None             | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| Parameter                 | Defaults         | Description                                                                                                                                                                                                                                                                                                                                                                        |
+|---------------------------|------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| build_target              | kernel           | Fixed parameter `kernel`, set the compilation target to the kernel.                                                                                                                                                                                                                                                                                                                |
+| kernel_version            | 5.10.125_5.15.50 | Specify kernel name, such as `5.10.125`. Function reference `-k`                                                                                                                                                                                                                                                                                                                   |
+| kernel_auto               | true             | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a`                                                                                                                                                                                                                                              |
+| kernel_package            | all              | Set the package list for compiling the kernel. The default is `all`. Function reference `-p`                                                                                                                                                                                                                                                                                       |
+| kernel_toolchain          | clang            | Set the compilation toolchain. The default is `clang`. Function reference `-t`                                                                                                                                                                                                                                                                                                     |
+| kernel_sign               | -ophub           | Set the kernel custom signature. The default is `-ophub`. Function reference `-n`                                                                                                                                                                                                                                                                                                  |
+| kernel_source             | unifreq          | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r`                                                                                                                                                                                                                                                                   |
+| kernel_config             | None             | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| build_files_upload_option | false            | If you would like to download kernel files directly, check this and download in Actions Artifacts, no need token settings. Otherwise, uncheck to upload to Github Release                                                                                                                                                                                                          |
 
 - ### GitHub Action Output variable description
 

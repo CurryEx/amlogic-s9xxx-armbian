@@ -76,6 +76,8 @@ armbian-update
 
 更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，如果不需要可以删除。
 
+💡 当前目录的内核版本号与当前系统内核的版本号一致将会提示不能升级，首先使用 `which armbian-update` 命令定位到 `armbian-update` 的路径，接着使用您喜欢的文本编辑器打开，查找 `Already the latest version` 将这行与上一行注释，并将下面的 `elif` 改为 `if` 即可
+
 💡 因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -r` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
 
 - ### 安装常用软件

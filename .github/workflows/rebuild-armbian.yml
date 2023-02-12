@@ -88,6 +88,11 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
+      upload_to_artifacts:
+        description: "Check to upload build files to Artifacts (no token settings required), uncheck to Release."
+        required: false
+        default: false
+        type: boolean
 
 env:
   TZ: America/New_York
@@ -95,7 +100,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -147,7 +152,7 @@ jobs:
 
       - name: Rebuild Armbian
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
+        if: ${{ env.ARMBIAN_URL != '' && !cancelled() }}
         with:
           build_target: armbian
           armbian_path: ${{ env.ARMBIAN_URL }}
@@ -160,9 +165,18 @@ jobs:
           armbian_sign: ${{ inputs.armbian_sign }}
           gh_token: ${{ secrets.GH_TOKEN }}
 
+
+      - name: Upload Armbian image to Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && inputs.upload_to_artifacts }}
+        with:
+          name: Armbian${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
+          retention-days: 14
+          path: ${{ env.PACKAGED_OUTPUTPATH }}
+
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && !inputs.upload_to_artifacts }}
         with:
           tag: Armbian${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*

@@ -92,6 +92,11 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
+      upload_to_artifacts:
+        description: "Check to upload build files to Artifacts (no token settings required), uncheck to Release. We recommend uncheck in the first compile for recompile."
+        required: false
+        default: false
+        type: boolean
 
 env:
   TZ: America/New_York
@@ -156,12 +161,20 @@ jobs:
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.compile.outputs.status == 'success' && !cancelled() && !inputs.upload_to_artifacts }}
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: build/output/images/*.img.gz
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
+
+      - name: Upload Armbian image to Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ steps.compile.outputs.status == 'success' && !cancelled() && inputs.upload_to_artifacts }}
+        with:
+          name: ${{ steps.compile.outputs.build_tag }}
+          retention-days: 14
+          path: build/output/images/*.img.gz
 
       - name: Rebuild Armbian
         uses: ophub/amlogic-s9xxx-armbian@main
@@ -178,9 +191,17 @@ jobs:
           armbian_sign: ${{ inputs.armbian_sign }}
           gh_token: ${{ secrets.GH_TOKEN }}
 
+      - name: Upload Rebuild image to Artifacts
+        uses: actions/upload-artifact@v3.1.2
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && inputs.upload_to_artifacts }}
+        with:
+          name: ${{ steps.compile.outputs.build_tag }}
+          retention-days: 14
+          path: ${{ env.PACKAGED_OUTPUTPATH }}
+
       - name: Upload Rebuild image to Release
         uses: ncipollo/release-action@main
-        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() && !inputs.upload_to_artifacts }}
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
